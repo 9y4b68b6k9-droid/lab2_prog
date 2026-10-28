@@ -5,28 +5,27 @@ import urllib.error
 def find_tandem_words(text: str) -> list[str]:
     if not text:
         return []
-    words = text.split()
+    words = re.findall(r'\b[а-яА-ЯёЁa-zA-Z]+\b', text)
     result = []
     for word in words:
-        clean_word = re.sub(r'[^\w\s]', '', word).lower()
-        if len(clean_word) < 4:
-            continue
-        if len(clean_word) % 2 == 0:
-            half = len(clean_word) // 2
-            if clean_word[:half] == clean_word[half:]:
-                result.append(word)
-        else:
-            half = len(clean_word) // 2
-            if clean_word[:half] == clean_word[half+1:]:
-                result.append(word)
+        word_lower = word.lower()
+        length = len(word_lower)
+        if length >= 4 and length % 2 == 0:
+            half = length // 2
+            if word_lower[:half] == word_lower[half:]:
+                result.append(word_lower)
     return list(set(result))
 
 def check_word(word: str) -> bool:
-    if word == "барабан":
-        return True
-    if word == "мама" or word == "папа" or word == "дядя":
-        return True
-    return False
+    word_lower = word.lower()
+    length = len(word_lower)
+    if length < 4:
+        return False
+    if length % 2 == 0:
+        half = length // 2
+        return word_lower[:half] == word_lower[half:]
+    else:
+        return False
 
 def process_file(filepath: str) -> None:
     try:
