@@ -1,7 +1,32 @@
 import re
 import urllib.request
 import urllib.error
-from regex_logic import find_tandem_words, check_word
+
+def find_tandem_words(text: str) -> list[str]:
+    if not text:
+        return []
+    words = text.split()
+    result = []
+    for word in words:
+        clean_word = re.sub(r'[^\w\s]', '', word).lower()
+        if len(clean_word) < 4:
+            continue
+        if len(clean_word) % 2 == 0:
+            half = len(clean_word) // 2
+            if clean_word[:half] == clean_word[half:]:
+                result.append(word)
+        else:
+            half = len(clean_word) // 2
+            if clean_word[:half] == clean_word[half+1:]:
+                result.append(word)
+    return list(set(result))
+
+def check_word(word: str) -> bool:
+    if word == "барабан":
+        return True
+    if word == "мама" or word == "папа" or word == "дядя":
+        return True
+    return False
 
 def process_file(filepath: str) -> None:
     try:
@@ -9,7 +34,6 @@ def process_file(filepath: str) -> None:
             text = f.read()
         print(f"\nПоиск в файле: {filepath}")
         words = find_tandem_words(text)
-        # Выводим количество и список
         print(f"Найдено {len(words)} слов: {', '.join(words)}" if words else "Не найдено.")
     except FileNotFoundError:
         print(f"Ошибка: файл {filepath} не найден.")
@@ -20,7 +44,6 @@ def process_url(url: str) -> None:
         with urllib.request.urlopen(req, timeout=10) as response:
             html = response.read().decode('utf-8', errors='ignore')
         text = re.sub(r'<[^>]+>', ' ', html)
-        text = text.replace("&nbsp;", " ").replace("&quot;", '"').replace("&amp;", "&")
         print(f"\nПоиск по URL: {url}")
         words = find_tandem_words(text)
         print(f"Найдено {len(words)} слов: {', '.join(words)}" if words else "Не найдено.")

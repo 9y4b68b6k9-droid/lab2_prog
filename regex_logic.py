@@ -1,13 +1,30 @@
 import re
 
-TANDEM_REGEX = re.compile(r'\b(\w+)\w?\1\b', re.IGNORECASE)
-
 def find_tandem_words(text: str) -> list[str]:
-    """Находит все слова с тандемным повтором в тексте."""
     if not text:
         return []
-    return list(dict.fromkeys([match.group(0) for match in TANDEM_REGEX.finditer(text)]))
+    words = re.findall(r'\b[а-яА-ЯёЁa-zA-Z]+\b', text)
+    result = []
+    for word in words:
+        word_lower = word.lower()
+        length = len(word_lower)
+        if length >= 4 and length % 2 == 0:
+            half = length // 2
+            if word_lower[:half] == word_lower[half:]:
+                result.append(word)
+        elif length >= 5 and length % 2 != 0:
+            half = length // 2
+            if word_lower[:half] == word_lower[half+1:]:
+                result.append(word)
+    return list(dict.fromkeys(result))
 
 def check_word(word: str) -> bool:
-    """Проверяет, является ли одно слово тандемным повтором."""
-    return bool(TANDEM_REGEX.fullmatch(word))
+    word_lower = word.lower()
+    length = len(word_lower)
+    if length >= 4 and length % 2 == 0:
+        half = length // 2
+        return word_lower[:half] == word_lower[half:]
+    elif length >= 5 and length % 2 != 0:
+        half = length // 2
+        return word_lower[:half] == word_lower[half+1:]
+    return False
