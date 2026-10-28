@@ -19,8 +19,8 @@ def process_url(url: str) -> None:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=10) as response:
             html = response.read().decode('utf-8', errors='ignore')
-        # Просто меняем теги на пробел
         text = re.sub(r'<[^>]+>', ' ', html)
+        text = text.replace("&nbsp;", " ").replace("&quot;", '"').replace("&amp;", "&")
         print(f"\nПоиск по URL: {url}")
         words = find_tandem_words(text)
         print(f"Найдено {len(words)} слов: {', '.join(words)}" if words else "Не найдено.")
